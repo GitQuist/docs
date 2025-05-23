@@ -1,33 +1,32 @@
 ---
-title: 'Introduction'
-description: 'Example section for showcasing API endpoints'
+title: 'API Introduction'
+description: 'Interactive API reference for the Xerpio SaaS Starter API.'
 ---
 
 <Note>
-  If you're not looking to build API reference documentation, you can delete
-  this section by removing the api-reference folder.
+  This page provides interactive documentation for the Xerpio SaaS Starter API, generated from our OpenAPI specification.
 </Note>
 
-## Welcome
+<OpenAPI spec="./openapi.json" />
 
-There are two ways to build API documentation: [OpenAPI](https://mintlify.com/docs/api-playground/openapi/setup) and [MDX components](https://mintlify.com/docs/api-playground/mdx/configuration). For the starter kit, we are using the following OpenAPI specification.
+## Authentication Overview
 
-<Card
-  title="Plant Store Endpoints"
-  icon="leaf"
-  href="https://github.com/mintlify/starter/blob/main/api-reference/openapi.json"
->
-  View the OpenAPI specification file
-</Card>
+The API supports authentication via API Keys (using the `X-API-Key` header) or session Cookies. 
+Refer to the details within each endpoint for specific security scheme requirements.
 
-## Authentication
-
-All API endpoints are authenticated using Bearer tokens and picked up from the specification file.
-
+For example, the general security definitions in the OpenAPI spec are:
 ```json
-"security": [
-  {
-    "bearerAuth": []
+"securitySchemes": {
+  "ApiKeyAuth": {
+    "type": "apiKey",
+    "in": "header",
+    "name": "X-API-Key"
+  },
+  "CookieAuth": {
+    "type": "apiKey",
+    "in": "header",
+    "name": "Cookie"
   }
-]
+}
 ```
+And individual endpoints will reference these schemes.
