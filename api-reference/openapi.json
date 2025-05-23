@@ -1,217 +1,608 @@
 {
-  "openapi": "3.1.0",
+  "openapi": "3.0.3",
   "info": {
-    "title": "OpenAPI Plant Store",
-    "description": "A sample API that uses a plant store as an example to demonstrate features in the OpenAPI specification",
-    "license": {
-      "name": "MIT"
-    },
-    "version": "1.0.0"
+    "title": "Xerpio SaaS Starter API",
+    "version": "v1",
+    "description": "API for managing invoices and related data for xerpio-saas-starter-q6gi.",
+    "contact": {
+      "name": "Xerpio Support",
+      "url": "https://xerpio.com",
+      "email": "support@xerpio.com"
+    }
   },
   "servers": [
     {
-      "url": "http://sandbox.mintlify.com"
-    }
-  ],
-  "security": [
-    {
-      "bearerAuth": []
-    }
-  ],
-  "paths": {
-    "/plants": {
-      "get": {
-        "description": "Returns all plants from the system that the user has access to",
-        "parameters": [
-          {
-            "name": "limit",
-            "in": "query",
-            "description": "The maximum number of results to return",
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Plant response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Plant"
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Unexpected error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "description": "Creates a new plant in the store",
-        "requestBody": {
-          "description": "Plant to add to the store",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/NewPlant"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "plant response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Plant"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "unexpected error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          }
-        }
-      }
+      "url": "http://localhost:4000",
+      "description": "Local development server"
     },
-    "/plants/{id}": {
-      "delete": {
-        "description": "Deletes a single plant based on the ID supplied",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "ID of plant to delete",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64"
-            }
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "Plant deleted",
-            "content": {}
-          },
-          "400": {
-            "description": "unexpected error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          }
+    {
+      "url": "https://{environment}-xerpio-saas-starter-q6gi.encr.app",
+      "description": "Cloud Environment",
+      "variables": {
+        "environment": {
+          "default": "prod",
+          "description": "The specific cloud environment name (e.g., 'prod', 'staging', 'pr123')."
         }
       }
     }
-  },
-  "webhooks": {
-    "/plant/webhook": {
-      "post": {
-        "description": "Information about a new plant added to the store",
-        "requestBody": {
-          "description": "Plant added to the store",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/NewPlant"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Return a 200 status to indicate that the data was received successfully"
-          }
-        }
-      }
-    }
-  },
+  ],
   "components": {
     "schemas": {
-      "Plant": {
-        "required": [
-          "name"
-        ],
+      "Invoice": {
         "type": "object",
         "properties": {
-          "name": {
-            "description": "The name of the plant",
-            "type": "string"
+          "id": {
+            "type": "string",
+            "description": "Unique identifier for the invoice.",
+            "readOnly": true
           },
-          "tag": {
-            "description": "Tag to specify the type",
-            "type": "string"
-          }
-        }
-      },
-      "NewPlant": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/Plant"
+          "externalId": {
+            "type": "string",
+            "nullable": true,
+            "description": "External identifier for the invoice."
           },
-          {
-            "required": [
-              "id"
-            ],
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp of when the invoice was created.",
+            "readOnly": true
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp of when the invoice was last updated.",
+            "readOnly": true
+          },
+          "invoiceNumber": {
+            "type": "string",
+            "nullable": true,
+            "description": "The invoice number."
+          },
+          "direction": {
+            "type": "string",
+            "nullable": true,
+            "description": "Direction of the invoice (e.g., incoming, outgoing)."
+          },
+          "amount": {
+            "type": "number",
+            "format": "double",
+            "nullable": true,
+            "description": "The amount excluding VAT."
+          },
+          "totalAmount": {
+            "type": "number",
+            "format": "double",
+            "nullable": true,
+            "description": "The total amount including VAT."
+          },
+          "vatAmount": {
+            "type": "number",
+            "format": "double",
+            "nullable": true,
+            "description": "The VAT amount."
+          },
+          "currency": {
+            "type": "string",
+            "nullable": true,
+            "description": "Currency code (e.g., USD, EUR)."
+          },
+          "invoiceDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "The date of the invoice."
+          },
+          "dueDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "The due date of the invoice."
+          },
+          "ourReferenceName": {
+            "type": "string",
+            "nullable": true
+          },
+          "ourReferenceEmail": {
+            "type": "string",
+            "nullable": true
+          },
+          "ourReferencePhone": {
+            "type": "string",
+            "nullable": true
+          },
+          "theirReferenceName": {
+            "type": "string",
+            "nullable": true
+          },
+          "theirReferenceEmail": {
+            "type": "string",
+            "nullable": true
+          },
+          "theirReferencePhone": {
+            "type": "string",
+            "nullable": true
+          },
+          "status": {
+            "type": "string",
+            "nullable": true,
+            "description": "Current status of the invoice."
+          },
+          "fileUrl": {
+            "type": "string",
+            "format": "url",
+            "nullable": true,
+            "description": "URL to the invoice file."
+          },
+          "fileName": {
+            "type": "string",
+            "nullable": true,
+            "description": "Original file name of the invoice."
+          },
+          "base64File": {
+            "type": "string",
+            "format": "byte",
+            "nullable": true,
+            "description": "Base64 encoded content of the invoice file (usually not returned on GET)."
+          },
+          "analysisStatus": {
+            "$ref": "#/components/schemas/InvoiceAnalysisStatus"
+          },
+          "analysisErrorMessage": {
+            "type": "string",
+            "nullable": true,
+            "description": "Error message if analysis failed."
+          },
+          "rawAnalysisData": {
             "type": "object",
-            "properties": {
-              "id": {
-                "description": "Identification number of the plant",
-                "type": "integer",
-                "format": "int64"
-              }
-            }
+            "nullable": true,
+            "description": "Raw data from the OCR/analysis process. Structure may vary.",
+            "additionalProperties": true
+          },
+          "supplierId": {
+            "type": "string",
+            "nullable": true
+          },
+          "supplier": {
+            "$ref": "#/components/schemas/Supplier",
+            "nullable": true
+          },
+          "lineItems": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InvoiceLineItem"
+            },
+            "nullable": true
+          },
+          "isEvaluationInvoice": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "goldenInvoiceFileName": {
+            "type": "string",
+            "nullable": true
           }
-        ]
+        },
+        "required": ["id", "createdAt", "updatedAt"]
       },
-      "Error": {
-        "required": [
-          "error",
-          "message"
-        ],
+      "InvoiceLineItem": {
         "type": "object",
         "properties": {
-          "error": {
-            "type": "integer",
-            "format": "int32"
+          "id": {
+            "type": "string",
+            "readOnly": true
+          },
+          "productId": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "exVatAmount": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "vatAmount": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "vatRate": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "totalAmount": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "currency": {
+            "type": "string",
+            "nullable": true
+          },
+          "quantity": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "unit": {
+            "type": "string",
+            "nullable": true
+          },
+          "accountClassNumber": {
+            "type": "string",
+            "nullable": true
+          },
+          "accountNumber": {
+            "type": "string",
+            "nullable": true
+          },
+          "invoiceId": {
+            "type": "string"
+          }
+        },
+        "required": ["id", "invoiceId"]
+      },
+      "Supplier": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "readOnly": true
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "readOnly": true
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "readOnly": true
+          },
+          "storeName": {
+            "type": "string",
+            "nullable": true
+          },
+          "storeStreetAddress": {
+            "type": "string",
+            "nullable": true
+          },
+          "storeZipCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "storeCity": {
+            "type": "string",
+            "nullable": true
+          },
+          "storeCountry": {
+            "type": "string",
+            "nullable": true
+          },
+          "storePhone": {
+            "type": "string",
+            "nullable": true
+          },
+          "storeEmail": {
+            "type": "string",
+            "format": "email",
+            "nullable": true
+          },
+          "storeVatNumber": {
+            "type": "string",
+            "nullable": true
+          },
+          "storeOrganizationNumber": {
+            "type": "string",
+            "nullable": true
+          },
+          "companyName": {
+            "type": "string",
+            "nullable": true
+          },
+          "companyStreetAddress": {
+            "type": "string",
+            "nullable": true
+          },
+          "companyZipCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "companyCity": {
+            "type": "string",
+            "nullable": true
+          },
+          "companyCountry": {
+            "type": "string",
+            "nullable": true
+          },
+          "companyPhone": {
+            "type": "string",
+            "nullable": true
+          },
+          "companyEmail": {
+            "type": "string",
+            "format": "email",
+            "nullable": true
+          },
+          "companyVatNumber": {
+            "type": "string",
+            "nullable": true
+          },
+          "companyOrganizationNumber": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": ["id", "createdAt", "updatedAt"]
+      },
+      "InvoiceAnalysisStatus": {
+        "type": "string",
+        "enum": [
+          "NOT_STARTED",
+          "OCR_PROCESSING",
+          "OCR_DONE",
+          "OCR_ERROR",
+          "ACCOUNTING_PROCESSING",
+          "ACCOUNTING_DONE",
+          "ACCOUNTING_ERROR",
+          "WAITING_FOR_HUMAN",
+          "SUCCESS",
+          "ERROR"
+        ],
+        "description": "The status of the invoice analysis process."
+      },
+      "PublicInvoiceCreatePayload": {
+        "type": "object",
+        "properties": {
+          "fileName": {
+            "type": "string",
+            "description": "The name of the file being uploaded."
+          },
+          "base64File": {
+            "type": "string",
+            "format": "byte",
+            "description": "Base64 encoded content of the invoice file."
+          },
+          "contentType": {
+            "type": "string",
+            "description": "MIME type of the file (e.g., 'application/pdf', 'image/jpeg')."
+          },
+          "webhookUrl": {
+            "type": "string",
+            "format": "url",
+            "description": "URL to be called when processing is complete or an event occurs."
+          },
+          "externalId": {
+            "type": "string",
+            "nullable": true,
+            "description": "Optional external identifier to associate with the invoice."
+          }
+        },
+        "required": ["fileName", "base64File", "contentType", "webhookUrl"]
+      },
+      "PublicInvoiceCreateResponse": {
+        "type": "object",
+        "properties": {
+          "invoiceId": {
+            "type": "string",
+            "description": "The ID of the newly created invoice."
+          },
+          "status": {
+            "type": "string",
+            "description": "The initial status of the invoice processing (e.g., 'SUBMITTED', 'PROCESSING')."
+          }
+        },
+        "required": ["invoiceId", "status"]
+      },
+      "ApiError": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "$ref": "#/components/schemas/ErrCode"
           },
           "message": {
-            "type": "string"
+            "type": "string",
+            "description": "A human-readable error message."
+          },
+          "details": {
+            "type": "object",
+            "nullable": true,
+            "description": "Additional details about the error.",
+            "additionalProperties": true
           }
-        }
+        },
+        "required": ["code", "message"]
+      },
+      "ErrCode": {
+        "type": "string",
+        "enum": [
+          "ok",
+          "canceled",
+          "unknown",
+          "invalid_argument",
+          "deadline_exceeded",
+          "not_found",
+          "already_exists",
+          "permission_denied",
+          "resource_exhausted",
+          "failed_precondition",
+          "aborted",
+          "out_of_range",
+          "unimplemented",
+          "internal",
+          "unavailable",
+          "data_loss",
+          "unauthenticated"
+        ],
+        "description": "Standard Encore error codes."
       }
     },
     "securitySchemes": {
-      "bearerAuth": {
-        "type": "http",
-        "scheme": "bearer"
+      "ApiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-API-Key",
+        "description": "API key for authentication."
+      },
+      "CookieAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Cookie",
+        "description": "Session cookie for authentication. The value should be the full string as sent by a browser."
       }
     }
-  }
+  },
+  "paths": {
+    "/public/v1/invoices": {
+      "post": {
+        "tags": ["Public Invoice API"],
+        "summary": "Submit a new invoice",
+        "description": "Uploads an invoice file for processing.",
+        "operationId": "submitInvoice",
+        "requestBody": {
+          "description": "Invoice data to be submitted.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PublicInvoiceCreatePayload"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Invoice submitted successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicInvoiceCreateResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request payload.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized, authentication is required and has failed or has not yet been provided.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          },
+          {
+            "CookieAuth": []
+          }
+        ]
+      }
+    },
+    "/public/v1/invoices/{invoiceId}": {
+      "get": {
+        "tags": ["Public Invoice API"],
+        "summary": "Get an invoice by ID",
+        "description": "Retrieves details of a specific invoice.",
+        "operationId": "getInvoice",
+        "parameters": [
+          {
+            "name": "invoiceId",
+            "in": "path",
+            "required": true,
+            "description": "ID of the invoice to retrieve.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful retrieval of invoice details.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Invoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Invoice not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          },
+          {
+            "CookieAuth": []
+          }
+        ]
+      }
+    }
+  },
+  "security": [
+    {
+      "ApiKeyAuth": []
+    },
+    {
+      "CookieAuth": []
+    }
+  ]
 }
