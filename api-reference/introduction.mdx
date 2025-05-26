@@ -11,22 +11,5 @@ description: 'Interactive API reference for the Xerpio SaaS Starter API.'
 
 ## Authentication Overview
 
-The API supports authentication via API Keys (using the `X-API-Key` header) or session Cookies. 
-Refer to the details within each endpoint for specific security scheme requirements.
+The API supports authentication via API Keys (using the `x-api-key` header)
 
-For example, the general security definitions in the OpenAPI spec are:
-```json
-"securitySchemes": {
-  "ApiKeyAuth": {
-    "type": "apiKey",
-    "in": "header",
-    "name": "X-API-Key"
-  },
-  "CookieAuth": {
-    "type": "apiKey",
-    "in": "header",
-    "name": "Cookie"
-  }
-}
-```
-And individual endpoints will reference these schemes.
