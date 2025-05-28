@@ -1,18 +1,18 @@
 {
   "openapi": "3.0.3",
   "info": {
-    "title": "Xerpio SaaS Starter API",
+    "title": "Figenty API",
     "version": "v1",
-    "description": "API for the xerpio-saas-starter-q6gi Encore application.\nThis OpenAPI specification is derived from the Encore v1.47.3 TypeScript client.",
+    "description": "API for the Figenty application.",
     "contact": {
-      "name": "Xerpio Support",
+      "name": "Figenty Support",
       "url": "https://example.com/support",
-      "email": "support@example.com"
+      "email": "support@figenty.com"
     }
   },
   "servers": [
     {
-      "url": "https://api.xerpio.se",
+      "url": "https://api.figenty.com",
       "description": "Production"
     }
   ],

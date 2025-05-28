@@ -27,7 +27,7 @@ x-api-key: YOUR_API_KEY
 ## Base URL
 
 ```
-https://api.xerpio.se
+https://api.figenty.com
 ```
 
 ## Workflow
@@ -39,7 +39,7 @@ Submit an invoice document for processing using the `/public/v1/invoices` endpoi
 <CodeGroup>
 
 ```bash cURL
-curl -X POST https://api.xerpio.se/public/v1/invoices \
+curl -X POST https://api.figenty.com/public/v1/invoices \
   -H "x-api-key: YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -52,7 +52,7 @@ curl -X POST https://api.xerpio.se/public/v1/invoices \
 ```
 
 ```javascript JavaScript
-const response = await fetch('https://api.xerpio.se/public/v1/invoices', {
+const response = await fetch('https://api.figenty.com/public/v1/invoices', {
   method: 'POST',
   headers: {
     'x-api-key': 'YOUR_API_KEY',
@@ -80,7 +80,7 @@ with open('invoice.pdf', 'rb') as file:
     base64_file = base64.b64encode(file.read()).decode('utf-8')
 
 response = requests.post(
-    'https://api.xerpio.se/public/v1/invoices',
+    'https://api.figenty.com/public/v1/invoices',
     headers={
         'x-api-key': 'YOUR_API_KEY',
         'Content-Type': 'application/json'
@@ -141,13 +141,13 @@ You can check the current status at any time:
 <CodeGroup>
 
 ```bash cURL
-curl -X GET https://api.xerpio.se/public/v1/invoices/inv_abc123def456/status \
+curl -X GET https://api.figenty.com/public/v1/invoices/inv_abc123def456/status \
   -H "x-api-key: YOUR_API_KEY"
 ```
 
 ```javascript JavaScript
 const response = await fetch(
-  'https://api.xerpio.se/public/v1/invoices/inv_abc123def456/status',
+  'https://api.figenty.com/public/v1/invoices/inv_abc123def456/status',
   {
     headers: {
       'x-api-key': 'YOUR_API_KEY'
@@ -186,13 +186,13 @@ Once processing is complete, retrieve the full invoice data:
 <CodeGroup>
 
 ```bash cURL
-curl -X GET https://api.xerpio.se/public/v1/invoices/inv_abc123def456 \
+curl -X GET https://api.figenty.com/public/v1/invoices/inv_abc123def456 \
   -H "x-api-key: YOUR_API_KEY"
 ```
 
 ```javascript JavaScript
 const response = await fetch(
-  'https://api.xerpio.se/public/v1/invoices/inv_abc123def456',
+  'https://api.figenty.com/public/v1/invoices/inv_abc123def456',
   {
     headers: {
       'x-api-key': 'YOUR_API_KEY'
@@ -220,7 +220,7 @@ Update invoice metadata using the PATCH endpoint:
 <CodeGroup>
 
 ```bash cURL
-curl -X PATCH https://api.xerpio.se/public/v1/invoices/inv_abc123def456 \
+curl -X PATCH https://api.figenty.com/public/v1/invoices/inv_abc123def456 \
   -H "x-api-key: YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -231,7 +231,7 @@ curl -X PATCH https://api.xerpio.se/public/v1/invoices/inv_abc123def456 \
 
 ```javascript JavaScript
 const response = await fetch(
-  'https://api.xerpio.se/public/v1/invoices/inv_abc123def456',
+  'https://api.figenty.com/public/v1/invoices/inv_abc123def456',
   {
     method: 'PATCH',
     headers: {
@@ -255,7 +255,7 @@ Retrieve a paginated list of your invoices with optional filtering:
 <CodeGroup>
 
 ```bash cURL
-curl -X GET "https://api.xerpio.se/public/v1/invoices?limit=20&page=1&status=SUCCESS" \
+curl -X GET "https://api.figenty.com/public/v1/invoices?limit=20&page=1&status=SUCCESS" \
   -H "x-api-key: YOUR_API_KEY"
 ```
 
@@ -269,7 +269,7 @@ const params = new URLSearchParams({
 });
 
 const response = await fetch(
-  `https://api.xerpio.se/public/v1/invoices?${params}`,
+  `https://api.figenty.com/public/v1/invoices?${params}`,
   {
     headers: {
       'x-api-key': 'YOUR_API_KEY'
@@ -349,7 +349,7 @@ Here's a complete example of processing an invoice:
 class InvoiceProcessor {
   constructor(apiKey) {
     this.apiKey = apiKey;
-    this.baseUrl = 'https://api.xerpio.se';
+    this.baseUrl = 'https://api.figenty.com';
   }
 
   async submitInvoice(filePath, webhookUrl, externalId) {
@@ -443,4 +443,4 @@ try {
 For technical support or questions about the API:
 - Email: support@example.com
 - Documentation: [API Reference](/api-reference)
-- Status Page: https://status.xerpio.se
+- Status Page: https://status.figenty.com
