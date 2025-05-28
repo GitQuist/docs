@@ -1,16 +1,283 @@
 {
   "openapi": "3.0.0",
   "info": {
-    "title": "Figenty Public API",
+    "title": "Figenty API",
     "version": "v1",
-    "description": "Public API for invoice processing and management provided by Figenty. Client version: Encore v1.48.1."
+    "description": "API for Figenty services, generated from TypeScript client."
   },
   "servers": [
     {
-      "url": "https://api.figenty.com",
-      "description": "Production server"
+      "url": "https://api.figenty.com"
     }
   ],
+  "tags": [
+    {
+      "name": "Public API Gateway",
+      "description": "Endpoints managed by the Public API Gateway"
+    }
+  ],
+  "paths": {
+    "/public/v1/invoices": {
+      "get": {
+        "summary": "List Invoices",
+        "operationId": "listInvoices",
+        "tags": ["Public API Gateway"],
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "integer" }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "integer" }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "NOT_STARTED",
+                "OCR_PROCESSING",
+                "OCR_DONE",
+                "OCR_ERROR",
+                "ACCOUNTING_PROCESSING",
+                "ACCOUNTING_DONE",
+                "ACCOUNTING_ERROR",
+                "WAITING_FOR_HUMAN",
+                "SUCCESS",
+                "ERROR"
+              ]
+            },
+            "description": "Filter by invoice analysis status. Can be one of the enum values or other string."
+          },
+          {
+            "name": "externalId",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "fileName",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "createdDateFrom",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "string", "format": "date-time" }
+          },
+          {
+            "name": "createdDateTo",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "string", "format": "date-time" }
+          },
+          {
+            "name": "updatedDateFrom",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "string", "format": "date-time" }
+          },
+          {
+            "name": "updatedDateTo",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "string", "format": "date-time" }
+          },
+          {
+            "name": "sortBy",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["createdAt", "updatedAt", "invoiceDate", "fileName"]
+            }
+          },
+          {
+            "name": "sortOrder",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["asc", "desc"]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of invoices.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListInvoicesResponse"
+                }
+              }
+            }
+          },
+          "default": { "$ref": "#/components/responses/ErrorResponse" }
+        },
+        "security": [{ "ApiKeyAuth": [] }]
+      },
+      "post": {
+        "summary": "Submit Invoice",
+        "operationId": "submitInvoice",
+        "tags": ["Public API Gateway"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PublicInvoiceCreatePayload"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Invoice submission confirmation.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicInvoiceCreateResponse"
+                }
+              }
+            }
+          },
+          "default": { "$ref": "#/components/responses/ErrorResponse" }
+        },
+        "security": [{ "ApiKeyAuth": [] }]
+      }
+    },
+    "/public/v1/invoices/{externalId}": {
+      "get": {
+        "summary": "Get Invoice by External ID",
+        "operationId": "getInvoice",
+        "tags": ["Public API Gateway"],
+        "parameters": [
+          {
+            "name": "externalId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Full invoice details.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/FullInvoiceResponse" }
+              }
+            }
+          },
+          "default": { "$ref": "#/components/responses/ErrorResponse" }
+        },
+        "security": [{ "ApiKeyAuth": [] }]
+      },
+      "delete": {
+        "summary": "Delete Invoice",
+        "operationId": "deleteInvoice",
+        "tags": ["Public API Gateway"],
+        "parameters": [
+          {
+            "name": "externalId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Deletion status.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "message": { "type": "string" }
+                  },
+                  "required": ["success", "message"]
+                }
+              }
+            }
+          },
+          "default": { "$ref": "#/components/responses/ErrorResponse" }
+        },
+        "security": [{ "ApiKeyAuth": [] }]
+      },
+      "patch": {
+        "summary": "Update Invoice",
+        "operationId": "updateInvoice",
+        "tags": ["Public API Gateway"],
+        "parameters": [
+          {
+            "name": "externalId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UpdateInvoicePayload" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated invoice details.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/FullInvoiceResponse" }
+              }
+            }
+          },
+          "default": { "$ref": "#/components/responses/ErrorResponse" }
+        },
+        "security": [{ "ApiKeyAuth": [] }]
+      }
+    },
+    "/public/v1/invoices/{externalId}/status": {
+      "get": {
+        "summary": "Get Invoice Status by External ID",
+        "operationId": "getInvoiceStatus",
+        "tags": ["Public API Gateway"],
+        "parameters": [
+          {
+            "name": "externalId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Invoice status details.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvoiceStatusResponse"
+                }
+              }
+            }
+          },
+          "default": { "$ref": "#/components/responses/ErrorResponse" }
+        },
+        "security": [{ "ApiKeyAuth": [] }]
+      }
+    }
+  },
   "components": {
     "schemas": {
       "InvoiceAnalysisStatus": {
@@ -26,127 +293,58 @@
           "WAITING_FOR_HUMAN",
           "SUCCESS",
           "ERROR"
-        ],
-        "description": "Represents the various stages of invoice analysis."
-      },
-      "InvoiceAnalysisStatusOrString": {
-        "oneOf": [
-          { "$ref": "#/components/schemas/InvoiceAnalysisStatus" },
-          { "type": "string", "description": "A custom status string." }
-        ],
-        "description": "The analysis status, either a predefined enum value or a custom string."
-      },
-      "InvoiceStatusResponse": {
-        "type": "object",
-        "properties": {
-          "externalId": { "type": "string" },
-          "status": {
-            "$ref": "#/components/schemas/InvoiceAnalysisStatusOrString"
-          },
-          "updatedAt": { "type": "string", "format": "date-time" },
-          "webhookCallStatus": { "type": "string", "nullable": true }
-        },
-        "required": ["externalId", "status", "updatedAt"]
-      },
-      "ListInvoicesResponse": {
-        "type": "object",
-        "properties": {
-          "data": {
-            "type": "array",
-            "items": { "$ref": "#/components/schemas/PublicInvoiceListItem" }
-          },
-          "meta": {
-            "type": "object",
-            "properties": {
-              "totalItems": { "type": "integer", "format": "int32" },
-              "itemsPerPage": { "type": "integer", "format": "int32" },
-              "currentPage": { "type": "integer", "format": "int32" },
-              "totalPages": { "type": "integer", "format": "int32" }
-            },
-            "required": [
-              "totalItems",
-              "itemsPerPage",
-              "currentPage",
-              "totalPages"
-            ]
-          }
-        },
-        "required": ["data", "meta"]
-      },
-      "PublicInvoiceCreatePayload": {
-        "type": "object",
-        "properties": {
-          "fileName": {
-            "type": "string",
-            "description": "Name of the file being submitted."
-          },
-          "base64File": {
-            "type": "string",
-            "format": "byte",
-            "description": "Base64 encoded content of the invoice file."
-          },
-          "contentType": {
-            "type": "string",
-            "description": "MIME type of the file (e.g., application/pdf, image/jpeg)."
-          },
-          "webhookUrl": {
-            "type": "string",
-            "format": "uri",
-            "description": "URL to send webhook notifications upon completion or status change."
-          },
-          "externalId": {
-            "type": "string",
-            "description": "User-defined external identifier for the invoice."
-          }
-        },
-        "required": [
-          "fileName",
-          "base64File",
-          "contentType",
-          "webhookUrl",
-          "externalId"
         ]
       },
-      "PublicInvoiceCreateResponse": {
-        "type": "object",
-        "properties": {
-          "invoiceId": {
-            "type": "string",
-            "description": "Internal ID of the created invoice."
-          },
-          "status": {
-            "type": "string",
-            "description": "Initial status of the submitted invoice."
-          }
-        },
-        "required": ["invoiceId", "status"]
-      },
-      "PublicInvoiceListItem": {
+      "Supplier": {
         "type": "object",
         "properties": {
           "id": { "type": "string" },
-          "externalId": { "type": "string", "nullable": true },
-          "fileName": { "type": "string", "nullable": true },
-          "analysisStatus": {
-            "$ref": "#/components/schemas/InvoiceAnalysisStatusOrString"
-          },
-          "invoiceDate": {
-            "type": "string",
-            "format": "date",
-            "nullable": true
-          },
-          "totalAmount": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "currency": { "type": "string", "nullable": true, "example": "USD" },
           "createdAt": { "type": "string", "format": "date-time" },
           "updatedAt": { "type": "string", "format": "date-time" },
-          "webhookUrl": { "type": "string", "format": "uri", "nullable": true },
-          "webhookCallStatus": { "type": "string", "nullable": true }
+          "storeName": { "type": "string", "nullable": true },
+          "storeStreetAddress": { "type": "string", "nullable": true },
+          "storeZipCode": { "type": "string", "nullable": true },
+          "storeCity": { "type": "string", "nullable": true },
+          "storeCountry": { "type": "string", "nullable": true },
+          "storePhone": { "type": "string", "nullable": true },
+          "storeEmail": { "type": "string", "nullable": true },
+          "storeVatNumber": { "type": "string", "nullable": true },
+          "storeOrganizationNumber": { "type": "string", "nullable": true },
+          "companyName": { "type": "string", "nullable": true },
+          "companyStreetAddress": { "type": "string", "nullable": true },
+          "companyZipCode": { "type": "string", "nullable": true },
+          "companyCity": { "type": "string", "nullable": true },
+          "companyCountry": { "type": "string", "nullable": true },
+          "companyPhone": { "type": "string", "nullable": true },
+          "companyEmail": { "type": "string", "nullable": true },
+          "companyVatNumber": { "type": "string", "nullable": true },
+          "companyOrganizationNumber": { "type": "string", "nullable": true },
+          "invoices": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/Invoice" },
+            "nullable": true
+          }
         },
-        "required": ["id", "analysisStatus", "createdAt", "updatedAt"]
+        "required": ["id", "createdAt", "updatedAt"]
+      },
+      "InvoiceLineItem": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "productId": { "type": "string", "nullable": true },
+          "description": { "type": "string", "nullable": true },
+          "exVatAmount": { "type": "number", "nullable": true },
+          "vatAmount": { "type": "number", "nullable": true },
+          "vatRate": { "type": "number", "nullable": true },
+          "totalAmount": { "type": "number", "nullable": true },
+          "currency": { "type": "string", "nullable": true },
+          "quantity": { "type": "number", "nullable": true },
+          "unit": { "type": "string", "nullable": true },
+          "accountClassNumber": { "type": "string", "nullable": true },
+          "accountNumber": { "type": "string", "nullable": true },
+          "invoiceId": { "type": "string" }
+        },
+        "required": ["id", "invoiceId"]
       },
       "Invoice": {
         "type": "object",
@@ -157,57 +355,39 @@
           "updatedAt": { "type": "string", "format": "date-time" },
           "invoiceNumber": { "type": "string", "nullable": true },
           "direction": { "type": "string", "nullable": true },
-          "amount": { "type": "number", "format": "double", "nullable": true },
-          "totalAmount": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "vatAmount": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
+          "amount": { "type": "number", "nullable": true },
+          "totalAmount": { "type": "number", "nullable": true },
+          "vatAmount": { "type": "number", "nullable": true },
           "currency": { "type": "string", "nullable": true },
           "invoiceDate": {
             "type": "string",
-            "format": "date",
+            "format": "date-time",
             "nullable": true
           },
-          "dueDate": { "type": "string", "format": "date", "nullable": true },
-          "ourReferenceName": { "type": "string", "nullable": true },
-          "ourReferenceEmail": {
+          "dueDate": {
             "type": "string",
-            "format": "email",
+            "format": "date-time",
             "nullable": true
           },
+          "ourReferenceName": { "type": "string", "nullable": true },
+          "ourReferenceEmail": { "type": "string", "nullable": true },
           "ourReferencePhone": { "type": "string", "nullable": true },
           "theirReferenceName": { "type": "string", "nullable": true },
-          "theirReferenceEmail": {
-            "type": "string",
-            "format": "email",
-            "nullable": true
-          },
+          "theirReferenceEmail": { "type": "string", "nullable": true },
           "theirReferencePhone": { "type": "string", "nullable": true },
           "status": { "type": "string", "nullable": true },
-          "fileUrl": { "type": "string", "format": "uri", "nullable": true },
+          "fileUrl": { "type": "string", "nullable": true },
           "fileName": { "type": "string", "nullable": true },
-          "base64File": {
-            "type": "string",
-            "format": "byte",
-            "nullable": true,
-            "description": "Base64 encoded content of the invoice file, if stored/returned directly."
-          },
+          "base64File": { "type": "string", "nullable": true },
           "analysisStatus": {
             "$ref": "#/components/schemas/InvoiceAnalysisStatus",
-            "description": "The specific analysis status from the predefined enum. This field is optional and will not be present if not set."
+            "nullable": true
           },
           "analysisErrorMessage": { "type": "string", "nullable": true },
           "rawAnalysisData": {
             "type": "object",
             "additionalProperties": true,
-            "nullable": true,
-            "description": "Raw JSON data from the analysis process."
+            "nullable": true
           },
           "supplierId": { "type": "string", "nullable": true },
           "supplier": {
@@ -224,480 +404,196 @@
         },
         "required": ["id", "createdAt", "updatedAt"]
       },
-      "InvoiceLineItem": {
+      "FullInvoiceResponse": {
         "type": "object",
         "properties": {
           "id": { "type": "string" },
-          "productId": { "type": "string", "nullable": true },
-          "description": { "type": "string", "nullable": true },
-          "exVatAmount": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "vatAmount": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "vatRate": { "type": "number", "format": "double", "nullable": true },
-          "totalAmount": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "currency": { "type": "string", "nullable": true },
-          "quantity": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "unit": { "type": "string", "nullable": true },
-          "accountClassNumber": { "type": "string", "nullable": true },
-          "accountNumber": { "type": "string", "nullable": true },
-          "invoiceId": { "type": "string" }
-        },
-        "required": ["id", "invoiceId"]
-      },
-      "Supplier": {
-        "type": "object",
-        "properties": {
-          "id": { "type": "string" },
+          "externalId": { "type": "string", "nullable": true },
           "createdAt": { "type": "string", "format": "date-time" },
           "updatedAt": { "type": "string", "format": "date-time" },
-          "storeName": { "type": "string", "nullable": true },
-          "storeStreetAddress": { "type": "string", "nullable": true },
-          "storeZipCode": { "type": "string", "nullable": true },
-          "storeCity": { "type": "string", "nullable": true },
-          "storeCountry": { "type": "string", "nullable": true },
-          "storePhone": { "type": "string", "nullable": true },
-          "storeEmail": {
+          "invoiceNumber": { "type": "string", "nullable": true },
+          "direction": { "type": "string", "nullable": true },
+          "amount": { "type": "number", "nullable": true },
+          "totalAmount": { "type": "number", "nullable": true },
+          "vatAmount": { "type": "number", "nullable": true },
+          "currency": { "type": "string", "nullable": true },
+          "invoiceDate": {
             "type": "string",
-            "format": "email",
+            "format": "date-time",
             "nullable": true
           },
-          "storeVatNumber": { "type": "string", "nullable": true },
-          "storeOrganizationNumber": { "type": "string", "nullable": true },
-          "companyName": { "type": "string", "nullable": true },
-          "companyStreetAddress": { "type": "string", "nullable": true },
-          "companyZipCode": { "type": "string", "nullable": true },
-          "companyCity": { "type": "string", "nullable": true },
-          "companyCountry": { "type": "string", "nullable": true },
-          "companyPhone": { "type": "string", "nullable": true },
-          "companyEmail": {
+          "dueDate": {
             "type": "string",
-            "format": "email",
+            "format": "date-time",
             "nullable": true
           },
-          "companyVatNumber": { "type": "string", "nullable": true },
-          "companyOrganizationNumber": { "type": "string", "nullable": true },
-          "invoices": {
+          "ourReferenceName": { "type": "string", "nullable": true },
+          "ourReferenceEmail": { "type": "string", "nullable": true },
+          "ourReferencePhone": { "type": "string", "nullable": true },
+          "theirReferenceName": { "type": "string", "nullable": true },
+          "theirReferenceEmail": { "type": "string", "nullable": true },
+          "theirReferencePhone": { "type": "string", "nullable": true },
+          "status": { "type": "string", "nullable": true },
+          "fileUrl": { "type": "string", "nullable": true },
+          "fileName": { "type": "string", "nullable": true },
+          "base64File": { "type": "string", "nullable": true },
+          "analysisStatus": {
+            "$ref": "#/components/schemas/InvoiceAnalysisStatus",
+            "nullable": true
+          },
+          "analysisErrorMessage": { "type": "string", "nullable": true },
+          "supplierId": { "type": "string", "nullable": true },
+          "supplier": {
+            "$ref": "#/components/schemas/Supplier",
+            "nullable": true
+          },
+          "lineItems": {
             "type": "array",
-            "items": { "$ref": "#/components/schemas/Invoice" },
-            "nullable": true,
-            "description": "A list of invoices associated with this supplier. This creates a circular reference with the Invoice schema."
+            "items": { "$ref": "#/components/schemas/InvoiceLineItem" },
+            "nullable": true
           }
         },
         "required": ["id", "createdAt", "updatedAt"]
       },
+      "InvoiceStatusResponse": {
+        "type": "object",
+        "properties": {
+          "externalId": { "type": "string" },
+          "status": { "type": "string" },
+          "updatedAt": { "type": "string", "format": "date-time" },
+          "webhookCallStatus": { "type": "string", "nullable": true }
+        },
+        "required": ["externalId", "status", "updatedAt"]
+      },
+      "PublicInvoiceListItem": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "externalId": { "type": "string", "nullable": true },
+          "fileName": { "type": "string", "nullable": true },
+          "analysisStatus": { "type": "string" },
+          "invoiceDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "totalAmount": { "type": "number", "nullable": true },
+          "currency": { "type": "string", "nullable": true },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "updatedAt": { "type": "string", "format": "date-time" },
+          "webhookUrl": { "type": "string", "nullable": true },
+          "webhookCallStatus": { "type": "string", "nullable": true }
+        },
+        "required": ["id", "analysisStatus", "createdAt", "updatedAt"]
+      },
+      "ListInvoicesResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/PublicInvoiceListItem" }
+          },
+          "meta": {
+            "type": "object",
+            "properties": {
+              "totalItems": { "type": "integer" },
+              "itemsPerPage": { "type": "integer" },
+              "currentPage": { "type": "integer" },
+              "totalPages": { "type": "integer" }
+            },
+            "required": [
+              "totalItems",
+              "itemsPerPage",
+              "currentPage",
+              "totalPages"
+            ]
+          }
+        },
+        "required": ["data", "meta"]
+      },
+      "PublicInvoiceCreatePayload": {
+        "type": "object",
+        "properties": {
+          "fileName": { "type": "string" },
+          "base64File": { "type": "string" },
+          "contentType": { "type": "string" },
+          "webhookUrl": { "type": "string" },
+          "externalId": { "type": "string" }
+        },
+        "required": [
+          "fileName",
+          "base64File",
+          "contentType",
+          "webhookUrl",
+          "externalId"
+        ]
+      },
+      "PublicInvoiceCreateResponse": {
+        "type": "object",
+        "properties": {
+          "externalId": { "type": "string" },
+          "status": { "type": "string" }
+        },
+        "required": ["externalId", "status"]
+      },
       "UpdateInvoicePayload": {
         "type": "object",
         "properties": {
-          "webhookUrl": {
-            "type": "string",
-            "format": "uri",
-            "nullable": true,
-            "description": "New webhook URL to associate with the invoice."
-          }
-        },
-        "description": "Payload for updating an invoice."
+          "webhookUrl": { "type": "string", "nullable": true }
+        }
       },
-      "DeleteInvoiceResponse": {
+      "ErrCode": {
+        "type": "string",
+        "enum": [
+          "ok",
+          "canceled",
+          "unknown",
+          "invalid_argument",
+          "deadline_exceeded",
+          "not_found",
+          "already_exists",
+          "permission_denied",
+          "resource_exhausted",
+          "failed_precondition",
+          "aborted",
+          "out_of_range",
+          "unimplemented",
+          "internal",
+          "unavailable",
+          "data_loss",
+          "unauthenticated"
+        ]
+      },
+      "ErrorResponseBody": {
         "type": "object",
         "properties": {
-          "success": {
-            "type": "boolean",
-            "description": "Indicates whether the delete operation was successful."
-          },
-          "message": {
-            "type": "string",
-            "description": "A message detailing the outcome of the operation."
-          }
-        },
-        "required": ["success", "message"],
-        "description": "Response from the delete invoice operation."
-      },
-      "ErrorResponse": {
-        "type": "object",
-        "properties": {
-          "code": {
-            "type": "string",
-            "enum": [
-              "ok",
-              "canceled",
-              "unknown",
-              "invalid_argument",
-              "deadline_exceeded",
-              "not_found",
-              "already_exists",
-              "permission_denied",
-              "resource_exhausted",
-              "failed_precondition",
-              "aborted",
-              "out_of_range",
-              "unimplemented",
-              "internal",
-              "unavailable",
-              "data_loss",
-              "unauthenticated"
-            ],
-            "description": "Encore error code corresponding to gRPC status codes."
-          },
-          "message": {
-            "type": "string",
-            "description": "A human-readable error message."
-          },
+          "code": { "$ref": "#/components/schemas/ErrCode" },
+          "message": { "type": "string" },
           "details": {
             "type": "object",
             "additionalProperties": true,
-            "nullable": true,
-            "description": "Optional additional error details."
+            "nullable": true
           }
         },
-        "required": ["code", "message"],
-        "description": "Standard error response format for the API."
+        "required": ["code", "message"]
       }
     },
     "securitySchemes": {
       "ApiKeyAuth": {
         "type": "apiKey",
         "in": "header",
-        "name": "x-api-key",
-        "description": "API key for authenticating requests. Obtain your API key from the Figenty dashboard."
-      }
-    }
-  },
-  "security": [{ "ApiKeyAuth": [] }],
-  "paths": {
-    "/public/v1/invoices": {
-      "get": {
-        "summary": "List Invoices",
-        "description": "Retrieves a list of invoices based on specified filter criteria. Supports pagination.",
-        "operationId": "listInvoices",
-        "tags": ["Invoices"],
-        "parameters": [
-          {
-            "name": "limit",
-            "in": "query",
-            "required": false,
-            "schema": { "type": "integer", "format": "int32", "default": 10 },
-            "description": "Number of invoices to return per page."
-          },
-          {
-            "name": "page",
-            "in": "query",
-            "required": false,
-            "schema": { "type": "integer", "format": "int32", "default": 1 },
-            "description": "Page number for pagination."
-          },
-          {
-            "name": "status",
-            "in": "query",
-            "required": false,
-            "schema": { "type": "string" },
-            "description": "Filter by invoice status. Can be one of the InvoiceAnalysisStatus enum values (e.g., NOT_STARTED, OCR_PROCESSING) or a custom string."
-          },
-          {
-            "name": "externalId",
-            "in": "query",
-            "required": false,
-            "schema": { "type": "string" },
-            "description": "Filter by external ID."
-          },
-          {
-            "name": "fileName",
-            "in": "query",
-            "required": false,
-            "schema": { "type": "string" },
-            "description": "Filter by file name."
-          },
-          {
-            "name": "createdDateFrom",
-            "in": "query",
-            "required": false,
-            "schema": { "type": "string", "format": "date-time" },
-            "description": "Filter by creation date (from), ISO 8601 format."
-          },
-          {
-            "name": "createdDateTo",
-            "in": "query",
-            "required": false,
-            "schema": { "type": "string", "format": "date-time" },
-            "description": "Filter by creation date (to), ISO 8601 format."
-          },
-          {
-            "name": "updatedDateFrom",
-            "in": "query",
-            "required": false,
-            "schema": { "type": "string", "format": "date-time" },
-            "description": "Filter by update date (from), ISO 8601 format."
-          },
-          {
-            "name": "updatedDateTo",
-            "in": "query",
-            "required": false,
-            "schema": { "type": "string", "format": "date-time" },
-            "description": "Filter by update date (to), ISO 8601 format."
-          },
-          {
-            "name": "sortBy",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "enum": ["createdAt", "updatedAt", "invoiceDate", "fileName"]
-            },
-            "description": "Field to sort invoices by."
-          },
-          {
-            "name": "sortOrder",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "enum": ["asc", "desc"],
-              "default": "desc"
-            },
-            "description": "Sort order (ascending or descending)."
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "A list of invoices matching the criteria.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ListInvoicesResponse"
-                }
-              }
-            }
-          },
-          "default": {
-            "description": "Unexpected error.",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "summary": "Submit Invoice",
-        "description": "Submits a new invoice for processing. The invoice file should be base64 encoded.",
-        "operationId": "submitInvoice",
-        "tags": ["Invoices"],
-        "requestBody": {
-          "description": "Invoice submission payload.",
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/PublicInvoiceCreatePayload"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Invoice submitted successfully. The response contains the ID and initial status of the invoice.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PublicInvoiceCreateResponse"
-                }
-              }
-            }
-          },
-          "default": {
-            "description": "Unexpected error or validation error.",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
-              }
-            }
-          }
-        }
+        "name": "x-api-key"
       }
     },
-    "/public/v1/invoices/{externalId}": {
-      "parameters": [
-        {
-          "name": "externalId",
-          "in": "path",
-          "required": true,
-          "schema": { "type": "string" },
-          "description": "External identifier of the invoice."
-        }
-      ],
-      "get": {
-        "summary": "Get Invoice Details",
-        "description": "Retrieves detailed information for a specific invoice by its external ID.",
-        "operationId": "getInvoice",
-        "tags": ["Invoices"],
-        "responses": {
-          "200": {
-            "description": "Detailed information about the invoice.",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/Invoice" }
-              }
-            }
-          },
-          "404": {
-            "description": "Invoice not found.",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
-              }
-            }
-          },
-          "default": {
-            "description": "Unexpected error.",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
-              }
-            }
-          }
-        }
-      },
-      "patch": {
-        "summary": "Update Invoice",
-        "description": "Updates specific fields of an existing invoice, such as the webhook URL, by its external ID.",
-        "operationId": "updateInvoice",
-        "tags": ["Invoices"],
-        "requestBody": {
-          "description": "Fields to update for the invoice. Only provided fields will be updated.",
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": { "$ref": "#/components/schemas/UpdateInvoicePayload" }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Invoice updated successfully. Returns the updated invoice details.",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/Invoice" }
-              }
-            }
-          },
-          "404": {
-            "description": "Invoice not found.",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
-              }
-            }
-          },
-          "default": {
-            "description": "Unexpected error or validation error.",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
-              }
-            }
-          }
-        }
-      },
-      "delete": {
-        "summary": "Delete Invoice",
-        "description": "Deletes an invoice by its external ID.",
-        "operationId": "deleteInvoice",
-        "tags": ["Invoices"],
-        "responses": {
-          "200": {
-            "description": "Invoice deleted successfully. Response indicates success and a message.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/DeleteInvoiceResponse"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Invoice not found.",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
-              }
-            }
-          },
-          "default": {
-            "description": "Unexpected error.",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/public/v1/invoices/{externalId}/status": {
-      "parameters": [
-        {
-          "name": "externalId",
-          "in": "path",
-          "required": true,
-          "schema": { "type": "string" },
-          "description": "External identifier of the invoice."
-        }
-      ],
-      "get": {
-        "summary": "Get Invoice Status",
-        "description": "Retrieves the current processing status of a specific invoice by its external ID.",
-        "operationId": "getInvoiceStatus",
-        "tags": ["Invoices"],
-        "responses": {
-          "200": {
-            "description": "Current status of the invoice.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/InvoiceStatusResponse"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Invoice not found.",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
-              }
-            }
-          },
-          "default": {
-            "description": "Unexpected error.",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
-              }
-            }
+    "responses": {
+      "ErrorResponse": {
+        "description": "Error response",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/ErrorResponseBody" }
           }
         }
       }
     }
-  },
-  "tags": [
-    {
-      "name": "Invoices",
-      "description": "Operations related to managing and processing invoices."
-    }
-  ]
+  }
 }
