@@ -24,49 +24,6 @@
   ],
   "paths": {
     "/public/v1/invoices": {
-      "post": {
-        "tags": ["Invoices"],
-        "summary": "Submit a new Invoice",
-        "operationId": "submitInvoice",
-        "requestBody": {
-          "description": "Invoice data to submit",
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/PublicInvoiceCreatePayload"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Invoice submitted successfully.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PublicInvoiceCreateResponse"
-                }
-              }
-            }
-          },
-          "default": {
-            "description": "Unexpected error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "ApiKeyAuth": []
-          }
-        ]
-      },
       "get": {
         "tags": ["Invoices"],
         "summary": "List Invoices",
@@ -190,6 +147,49 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ListInvoicesResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ]
+      },
+      "post": {
+        "tags": ["Invoices"],
+        "summary": "Submit a new Invoice",
+        "operationId": "submitInvoice",
+        "requestBody": {
+          "description": "Invoice data to submit",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PublicInvoiceCreatePayload"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Invoice submitted successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicInvoiceCreateResponse"
                 }
               }
             }
