@@ -317,7 +317,7 @@
         "properties": {
           "success": {
             "type": "boolean",
-            "description": "Indicates whether the soft delete operation was successful."
+            "description": "Indicates whether the delete operation was successful."
           },
           "message": {
             "type": "string",
@@ -325,7 +325,7 @@
           }
         },
         "required": ["success", "message"],
-        "description": "Response from the soft delete invoice operation."
+        "description": "Response from the delete invoice operation."
       },
       "ErrorResponse": {
         "type": "object",
@@ -620,7 +620,7 @@
         "tags": ["Invoices"],
         "responses": {
           "200": {
-            "description": "Invoice soft deleted successfully. Response indicates success and a message.",
+            "description": "Invoice deleted successfully. Response indicates success and a message.",
             "content": {
               "application/json": {
                 "schema": {
