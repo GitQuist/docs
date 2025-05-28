@@ -11,6 +11,15 @@
   "navigation": {
     "tabs": [
       {
+        "tab": "Guides",
+        "groups": [
+          {
+            "group": "Getting Started",
+            "pages": ["guides/guide"]
+          }
+        ]
+      },
+      {
         "tab": "API Reference",
         "groups": [
           {
