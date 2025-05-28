@@ -68,7 +68,7 @@ const response = await fetch('https://api.figenty.com/public/v1/invoices', {
 });
 
 const data = await response.json();
-console.log('Invoice ID:', data.invoiceId);
+console.log('External ID:', data.externalId);
 ```
 
 ```python Python
@@ -95,7 +95,7 @@ response = requests.post(
 )
 
 data = response.json()
-print(f"Invoice ID: {data['invoiceId']}")
+print(f"External ID: {data['externalId']}")
 ```
 
 </CodeGroup>
@@ -108,13 +108,13 @@ print(f"Invoice ID: {data['invoiceId']}")
 | `base64File` | string | Yes | Base64-encoded file content |
 | `contentType` | string | Yes | MIME type (e.g., `application/pdf`, `image/jpeg`) |
 | `webhookUrl` | string | Yes | URL to receive completion notifications |
-| `externalId` | string | No | Your internal reference ID |
+| `externalId` | string | Yes | Your internal reference ID. Has to be unique. |
 
 **Response:**
 
 ```json
 {
-  "invoiceId": "inv_abc123def456",
+  "externalId": "inv_12345",
   "status": "NOT_STARTED"
 }
 ```
@@ -136,18 +136,18 @@ Once submitted, your invoice goes through several processing stages:
 | `SUCCESS` | Processing completed successfully |
 | `ERROR` | Processing failed |
 
-You can check the current status at any time:
+You can check the current status at any time using your external ID:
 
 <CodeGroup>
 
 ```bash cURL
-curl -X GET https://api.figenty.com/public/v1/invoices/inv_abc123def456/status \
+curl -X GET https://api.figenty.com/public/v1/invoices/inv_12345/status \
   -H "x-api-key: YOUR_API_KEY"
 ```
 
 ```javascript JavaScript
 const response = await fetch(
-  'https://api.figenty.com/public/v1/invoices/inv_abc123def456/status',
+  'https://api.figenty.com/public/v1/invoices/inv_12345/status',
   {
     headers: {
       'x-api-key': 'YOUR_API_KEY'
@@ -167,7 +167,7 @@ When processing is complete, we'll send a POST request to your webhook URL:
 
 ```json
 {
-  "invoiceId": "inv_abc123def456",
+  "externalId": "inv_12345",
   "status": "SUCCESS",
   "updatedAt": "2024-01-15T10:30:00Z",
   "webhookCallStatus": "delivered"
@@ -181,18 +181,18 @@ When processing is complete, we'll send a POST request to your webhook URL:
 
 ### 4. Retrieve Processed Invoice
 
-Once processing is complete, retrieve the full invoice data:
+Once processing is complete, retrieve the full invoice data using your external ID:
 
 <CodeGroup>
 
 ```bash cURL
-curl -X GET https://api.figenty.com/public/v1/invoices/inv_abc123def456 \
+curl -X GET https://api.figenty.com/public/v1/invoices/inv_12345 \
   -H "x-api-key: YOUR_API_KEY"
 ```
 
 ```javascript JavaScript
 const response = await fetch(
-  'https://api.figenty.com/public/v1/invoices/inv_abc123def456',
+  'https://api.figenty.com/public/v1/invoices/inv_12345',
   {
     headers: {
       'x-api-key': 'YOUR_API_KEY'
@@ -215,23 +215,22 @@ console.log('Invoice data:', invoice);
 
 ### 5. Update Invoice Metadata
 
-Update invoice metadata using the PATCH endpoint:
+Update invoice webhook URL using the PATCH endpoint:
 
 <CodeGroup>
 
 ```bash cURL
-curl -X PATCH https://api.figenty.com/public/v1/invoices/inv_abc123def456 \
+curl -X PATCH https://api.figenty.com/public/v1/invoices/inv_12345 \
   -H "x-api-key: YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
-    "externalId": "updated_inv_12345",
     "webhookUrl": "https://your-app.com/new-webhook-endpoint"
   }'
 ```
 
 ```javascript JavaScript
 const response = await fetch(
-  'https://api.figenty.com/public/v1/invoices/inv_abc123def456',
+  'https://api.figenty.com/public/v1/invoices/inv_12345',
   {
     method: 'PATCH',
     headers: {
@@ -239,11 +238,38 @@ const response = await fetch(
       'Content-Type': 'application/json'
     },
     body: JSON.stringify({
-      externalId: 'updated_inv_12345',
       webhookUrl: 'https://your-app.com/new-webhook-endpoint'
     })
   }
 );
+```
+
+</CodeGroup>
+
+### 6. Delete Invoice
+
+Delete an invoice using your external ID:
+
+<CodeGroup>
+
+```bash cURL
+curl -X DELETE https://api.figenty.com/public/v1/invoices/inv_12345 \
+  -H "x-api-key: YOUR_API_KEY"
+```
+
+```javascript JavaScript
+const response = await fetch(
+  'https://api.figenty.com/public/v1/invoices/inv_12345',
+  {
+    method: 'DELETE',
+    headers: {
+      'x-api-key': 'YOUR_API_KEY'
+    }
+  }
+);
+
+const result = await response.json();
+console.log('Deletion result:', result);
 ```
 
 </CodeGroup>
@@ -295,6 +321,8 @@ console.log('Total pages:', data.meta.totalPages);
 | `fileName` | string | Filter by file name |
 | `createdDateFrom` | string | Filter by creation date (ISO 8601) |
 | `createdDateTo` | string | Filter by creation date (ISO 8601) |
+| `updatedDateFrom` | string | Filter by updated date (ISO 8601) |
+| `updatedDateTo` | string | Filter by updated date (ISO 8601) |
 | `sortBy` | string | Sort field: `createdAt`, `updatedAt`, `invoiceDate`, `fileName` |
 | `sortOrder` | string | Sort order: `asc` or `desc` (default: `desc`) |
 
@@ -339,7 +367,7 @@ The API uses standard HTTP status codes and returns detailed error information:
 ### Error Recovery
 - Implement retry logic for transient errors
 - Check invoice status if webhook delivery fails
-- Store invoice IDs for later retrieval
+- Store external IDs for later retrieval
 
 ## Example Integration
 
@@ -355,6 +383,7 @@ class InvoiceProcessor {
   async submitInvoice(filePath, webhookUrl, externalId) {
     // Read and encode file
     const fs = require('fs');
+    const path = require('path');
     const fileBuffer = fs.readFileSync(filePath);
     const base64File = fileBuffer.toString('base64');
     
@@ -380,9 +409,9 @@ class InvoiceProcessor {
     return await response.json();
   }
 
-  async getInvoice(invoiceId) {
+  async getInvoice(externalId) {
     const response = await fetch(
-      `${this.baseUrl}/public/v1/invoices/${invoiceId}`,
+      `${this.baseUrl}/public/v1/invoices/${externalId}`,
       {
         headers: {
           'x-api-key': this.apiKey
@@ -397,14 +426,31 @@ class InvoiceProcessor {
     return await response.json();
   }
 
-  async waitForCompletion(invoiceId, maxWaitTime = 300000) {
+  async getInvoiceStatus(externalId) {
+    const response = await fetch(
+      `${this.baseUrl}/public/v1/invoices/${externalId}/status`,
+      {
+        headers: {
+          'x-api-key': this.apiKey
+        }
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(`Failed to get invoice status: ${response.statusText}`);
+    }
+
+    return await response.json();
+  }
+
+  async waitForCompletion(externalId, maxWaitTime = 300000) {
     const startTime = Date.now();
     
     while (Date.now() - startTime < maxWaitTime) {
-      const status = await this.getInvoiceStatus(invoiceId);
+      const status = await this.getInvoiceStatus(externalId);
       
       if (status.status === 'SUCCESS') {
-        return await this.getInvoice(invoiceId);
+        return await this.getInvoice(externalId);
       } else if (status.status === 'ERROR') {
         throw new Error('Invoice processing failed');
       }
@@ -427,10 +473,10 @@ try {
     'inv_12345'
   );
   
-  console.log('Invoice submitted:', result.invoiceId);
+  console.log('Invoice submitted:', result.externalId);
   
   // Wait for completion (alternative to webhook)
-  const invoice = await processor.waitForCompletion(result.invoiceId);
+  const invoice = await processor.waitForCompletion(result.externalId);
   console.log('Processing complete:', invoice);
   
 } catch (error) {
