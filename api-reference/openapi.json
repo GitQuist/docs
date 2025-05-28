@@ -1,9 +1,9 @@
 {
   "openapi": "3.0.0",
   "info": {
-    "title": "Figenty partner API",
+    "title": "Figenty Public API",
     "version": "v1",
-    "description": "Partner API for invoice processing and management provided by Figenty."
+    "description": "Public API for invoice processing and management provided by Figenty. Client version: Encore v1.48.1."
   },
   "servers": [
     {
@@ -312,6 +312,21 @@
         },
         "description": "Payload for updating an invoice."
       },
+      "DeleteInvoiceResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "description": "Indicates whether the soft delete operation was successful."
+          },
+          "message": {
+            "type": "string",
+            "description": "A message detailing the outcome of the operation."
+          }
+        },
+        "required": ["success", "message"],
+        "description": "Response from the soft delete invoice operation."
+      },
       "ErrorResponse": {
         "type": "object",
         "properties": {
@@ -590,6 +605,40 @@
           },
           "default": {
             "description": "Unexpected error or validation error.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete Invoice",
+        "description": "Deletes an invoice by its external ID.",
+        "operationId": "deleteInvoice",
+        "tags": ["Invoices"],
+        "responses": {
+          "200": {
+            "description": "Invoice soft deleted successfully. Response indicates success and a message.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeleteInvoiceResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Invoice not found.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          },
+          "default": {
+            "description": "Unexpected error.",
             "content": {
               "application/json": {
                 "schema": { "$ref": "#/components/schemas/ErrorResponse" }
