@@ -183,7 +183,7 @@
         "security": [{ "ApiKeyAuth": [] }]
       },
       "delete": {
-        "summary": "Delete Invoice",
+        "summary": "Delete invoice.",
         "operationId": "deleteInvoice",
         "tags": ["Public API Gateway"],
         "parameters": [
@@ -379,6 +379,8 @@
           "fileUrl": { "type": "string", "nullable": true },
           "fileName": { "type": "string", "nullable": true },
           "base64File": { "type": "string", "nullable": true },
+          "webhookUrl": { "type": "string", "nullable": true },
+          "webhookCallStatus": { "type": "string", "nullable": true },
           "analysisStatus": {
             "$ref": "#/components/schemas/InvoiceAnalysisStatus",
             "nullable": true
@@ -437,6 +439,8 @@
           "fileUrl": { "type": "string", "nullable": true },
           "fileName": { "type": "string", "nullable": true },
           "base64File": { "type": "string", "nullable": true },
+          "webhookUrl": { "type": "string", "nullable": true },
+          "webhookCallStatus": { "type": "string", "nullable": true },
           "analysisStatus": {
             "$ref": "#/components/schemas/InvoiceAnalysisStatus",
             "nullable": true
@@ -459,7 +463,22 @@
         "type": "object",
         "properties": {
           "externalId": { "type": "string" },
-          "status": { "type": "string" },
+          "status": {
+            "type": "string",
+            "description": "Can be one of InvoiceAnalysisStatus enum values or other string.",
+            "enum": [
+              "NOT_STARTED",
+              "OCR_PROCESSING",
+              "OCR_DONE",
+              "OCR_ERROR",
+              "ACCOUNTING_PROCESSING",
+              "ACCOUNTING_DONE",
+              "ACCOUNTING_ERROR",
+              "WAITING_FOR_HUMAN",
+              "SUCCESS",
+              "ERROR"
+            ]
+          },
           "updatedAt": { "type": "string", "format": "date-time" },
           "webhookCallStatus": { "type": "string", "nullable": true }
         },
@@ -471,7 +490,22 @@
           "id": { "type": "string" },
           "externalId": { "type": "string", "nullable": true },
           "fileName": { "type": "string", "nullable": true },
-          "analysisStatus": { "type": "string" },
+          "analysisStatus": {
+            "type": "string",
+            "description": "Can be one of InvoiceAnalysisStatus enum values or other string.",
+            "enum": [
+              "NOT_STARTED",
+              "OCR_PROCESSING",
+              "OCR_DONE",
+              "OCR_ERROR",
+              "ACCOUNTING_PROCESSING",
+              "ACCOUNTING_DONE",
+              "ACCOUNTING_ERROR",
+              "WAITING_FOR_HUMAN",
+              "SUCCESS",
+              "ERROR"
+            ]
+          },
           "invoiceDate": {
             "type": "string",
             "format": "date-time",
@@ -536,11 +570,29 @@
         },
         "required": ["externalId", "status"]
       },
+      "UpdateInvoiceLineItemPayload": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "accountClassNumber": { "type": "string", "nullable": true },
+          "accountNumber": { "type": "string", "nullable": true },
+          "exVatAmount": { "type": "number", "nullable": true },
+          "vatAmount": { "type": "number", "nullable": true },
+          "totalAmount": { "type": "number", "nullable": true }
+        },
+        "required": ["id"]
+      },
       "UpdateInvoicePayload": {
         "type": "object",
         "properties": {
-          "webhookUrl": { "type": "string", "nullable": true }
-        }
+          "lineItems": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UpdateInvoiceLineItemPayload"
+            }
+          }
+        },
+        "required": ["lineItems"]
       },
       "ErrCode": {
         "type": "string",
